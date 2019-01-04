@@ -62,10 +62,7 @@ public class TrailerFragment extends Fragment {
         // Inflate the layout for this fragment
      View view = inflater.inflate(R.layout.fragment_trailer, container, false);
      ButterKnife.bind(this,view);
-//        baseUrls = new BaseUrls();
-//        apiService = ApiClient.getClient().create(ApiInteface.class);
-//        getTrailersMovies(MOVIE_ID);
-        return view;
+     return view;
     }
 
     @Override
@@ -83,21 +80,7 @@ public class TrailerFragment extends Fragment {
         trailerAdapter = new TrailerAdapter(getContext(),trailers,MOVIE_POSTER);
         trailerRecyclerView.setAdapter(trailerAdapter);
     }
-//    public void getTrailersMovies(int id){
-//        Call<TrailersResponse> call = apiService.getTrailerMovies(id,API_KEY);
-//        call.enqueue(new Callback<TrailersResponse>() {
-//            @Override
-//            public void onResponse(Call<TrailersResponse> call, Response<TrailersResponse> response) {
-//                trailers = response.body().getResults();
-//                initUi();
-//            }
-//
-//            @Override
-//            public void onFailure(Call<TrailersResponse> call, Throwable t) {
-//                Log.e(TAG, "" + t.getMessage());
-//            }
-//            });
-//    }
+
 
     private class FetchTrailerData extends AsyncTask<String,Void,ArrayList<Trailer>> {
         private final String LOG_TAG = FetchTrailerData.class.getSimpleName();

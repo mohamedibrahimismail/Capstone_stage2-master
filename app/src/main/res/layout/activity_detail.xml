@@ -77,8 +77,10 @@
         android:id="@+id/tv_tagline"
         android:layout_weight="1"
         android:layout_gravity="center"
-        android:paddingLeft="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         />
+
         <com.github.zagum.switchicon.SwitchIconView
             android:id="@+id/btn_favorite"
             android:layout_width="36dp"

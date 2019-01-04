@@ -6,7 +6,7 @@ android {
         config {
             keyAlias 'key0'
             keyPassword '12345678'
-            storeFile file('keystore')
+            storeFile file('../keystore.jks')
             storePassword '12345678'
         }
     }
@@ -52,5 +52,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
 }
 apply plugin: 'com.google.gms.google-services'

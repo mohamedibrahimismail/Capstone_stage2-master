@@ -125,6 +125,7 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
+
     private void initUi(){
 
         Bundle bundle = new Bundle();
@@ -144,30 +145,20 @@ public class DetailActivity extends AppCompatActivity {
             backDrobPathImageView.setScaleType(ImageView.ScaleType.FIT_XY);
         }
 
-        Log.d("getRuntime",movieDetail.getRuntime()+"------------------------------------");
         movieInfo.add(new MovieInfo(R.drawable.ic_clock,movieDetail.getRuntime()+""));
-
-        Log.d("getRuntime",movieDetail.getRelease_date()+"------------------------------------");
         movieInfo.add(new MovieInfo(R.drawable.ic_release_date,movieDetail.getRelease_date()+""));
-
-        Log.d("getRuntime",movieDetail.getRevenue()+"------------------------------------");
         movieInfo.add(new MovieInfo(R.drawable.ic_money,movieDetail.getRevenue()+""));
-
-        Log.d("getRuntime",movieDetail.getBudget()+"------------------------------------");
         movieInfo.add(new MovieInfo(R.drawable.ic_budget,movieDetail.getBudget()+""));
-
-        Log.d("getRuntime",movieDetail.getVote_count()+"------------------------------------");
         movieInfo.add(new MovieInfo(R.drawable.ic_employee,movieDetail.getVote_count()+""));
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        movieInfoRecyclerView.setLayoutManager(linearLayoutManager);
+        LinearLayoutManager linearLayoutManagermovieInfoRecyclerView = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        movieInfoRecyclerView.setLayoutManager(linearLayoutManagermovieInfoRecyclerView);
         movieInfoAdapter = new MovieInfoAdapter(this,movieInfo);
         movieInfoRecyclerView.setAdapter(movieInfoAdapter);
-
-        LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        similarRecyclerView.setLayoutManager(linearLayoutManager1);
-        LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        recomendedRecyclerView.setLayoutManager(linearLayoutManager2);
+        LinearLayoutManager linearLayoutManagersimilarRecyclerView = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        similarRecyclerView.setLayoutManager(linearLayoutManagersimilarRecyclerView);
+        LinearLayoutManager linearLayoutManagerrecomendedRecyclerView = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        recomendedRecyclerView.setLayoutManager(linearLayoutManagerrecomendedRecyclerView);
 
         Handler uiHandler = new Handler(Looper.getMainLooper());
         uiHandler.post(new Runnable(){
@@ -180,6 +171,8 @@ public class DetailActivity extends AppCompatActivity {
         });
 
     }
+
+
     public void getMovieDetail(final int id){
         Log.e("id",id+"");
         Call<MovieDetail> call = apiService.getMovieDetails(id,API_KEY);
@@ -203,6 +196,8 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
     }
+
+
     public void getSimilarMovies(int id){
         Call<MoviesResponse> call = apiService.getSimilarMovies(id,API_KEY);
         call.enqueue(new Callback<MoviesResponse>() {
@@ -220,6 +215,8 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
     }
+
+
     public void getRecomendedMovies(int id){
         Call<MoviesResponse> call = apiService.getRecommendationsMovies(id,API_KEY);
         call.enqueue(new Callback<MoviesResponse>() {
@@ -240,6 +237,9 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
     }
+
+
+
     public void addMovieToFavorites(){
         favorite.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -255,7 +255,7 @@ public class DetailActivity extends AppCompatActivity {
                     values.put(MovieContruct.Favorite.TITLE, movieDetail.getTitle());
                     values.put(MovieContruct.Favorite.VOTE_AVERAGE, movieDetail.getVote_average());
                     Uri uri = getContentResolver().insert(MovieProvider.CONTENT_URI,values);
-                    Log.e(DetailActivity.class.getSimpleName(),uri+"");
+                    Log.e(DetailActivity.class.getSimpleName(),uri+"---------------------------------");
                     favorite.setIconEnabled(true);
                     Toasty.success(getApplicationContext(), getResources().getString(R.string.movie_add), Toast.LENGTH_SHORT).show();
                 }else {
@@ -273,20 +273,25 @@ public class DetailActivity extends AppCompatActivity {
                 }
         });
     }
-    public void checkIfMovieFavorite(){
 
-        //this method to check if the movie in favorite list
-        String URL = MovieProvider.CONTENT_URI+"/"+movieDetail.getId();
-        Uri uri = Uri.parse(URL);
-        String selection = "movie_id = ?";
-        String selectionArgs [] = new String[]{movieDetail.getId() + ""};
-        c = getContentResolver().query(uri,null,selection,selectionArgs,null);
-        if (c.moveToFirst()){
-            favorite.setIconEnabled(true);
-        }else {
-            favorite.setIconEnabled(false);
+
+
+        public void checkIfMovieFavorite(){
+
+            //this method to check if the movie in favorite list
+            String URL = MovieProvider.CONTENT_URI+"/"+movieDetail.getId();
+            Uri uri = Uri.parse(URL);
+            String selection = "movie_id = ?";
+            String selectionArgs [] = new String[]{movieDetail.getId() + ""};
+            c = getContentResolver().query(uri,null,selection,selectionArgs,null);
+            if (c.moveToFirst()){
+                favorite.setIconEnabled(true);
+            }else {
+                favorite.setIconEnabled(false);
+            }
         }
-        }
+
+
 
         public void openTrailers(View view){
         ContainerActivity.myFragment = new TrailerFragment();

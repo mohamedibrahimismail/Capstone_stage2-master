@@ -50,6 +50,7 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
     public int  deleteFavorite(String selection,String[] selectionArgs) {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         int delete = sqLiteDatabase.delete(MovieContruct.Favorite.TABLE_NAME, selection, selectionArgs);
+        Log.e("deleteFavorite",delete+"---------------------------------");
         return delete;
     }
     public Cursor queryMoiveData(){
@@ -57,6 +58,7 @@ public class MovieDatabaseHelper extends SQLiteOpenHelper {
         Cursor c=sqLiteDatabase.query(MovieContruct.Favorite.TABLE_NAME, null, null, null, null, null, null);
         return c;
     }
+
     public Cursor queryMoiveData(String selection, String[] selectionArgs){
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         Cursor c=sqLiteDatabase.query(MovieContruct.Favorite.TABLE_NAME, null, selection, selectionArgs, null, null, null);

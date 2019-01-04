@@ -1,5 +1,6 @@
 package com.example.mieib.capstone_stage2;
 
+import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.nfc.Tag;
 import android.support.annotation.NonNull;
@@ -87,7 +88,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         baseUrls = new BaseUrls();
         apiService = ApiClient.getClient().create(ApiInteface.class);
-        getSupportLoaderManager().initLoader(0, null, this);
+
+
         initUi();
         if (CheckInternetConnection.isConnected(getApplicationContext())){
         getPopularMovies();
@@ -101,9 +103,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
-    private void initAdMob(){
-        Log.e(TAG,"call ads");
 
+    @Override
+    protected void onResume() {
+        getSupportLoaderManager().restartLoader(0, null, this);
+        super.onResume();
+    }
+
+    private void initAdMob(){
+
+        Log.e(TAG,"call ads");
         MobileAds.initialize(this, ADMOB_APP_ID);
         AdRequest adRequest = new AdRequest.Builder()
 //                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)        // All emulators
@@ -161,19 +170,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void initUi(){
-        LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        LinearLayoutManager linearLayoutManager2 = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        LinearLayoutManager linearLayoutManager3 = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        LinearLayoutManager linearLayoutManager4 = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        LinearLayoutManager linearLayoutManager5 = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
-        popularRecyclerView.setLayoutManager(linearLayoutManager1);
-        topRatedRecyclerView.setLayoutManager(linearLayoutManager2);
-        playingNowRecyclerView.setLayoutManager(linearLayoutManager3);
-        upcomingRecyclerView.setLayoutManager(linearLayoutManager4);
-        favoriteRecyclerView.setLayoutManager(linearLayoutManager5);
+        LinearLayoutManager linearLayoutManagerpopularRecyclerView = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        LinearLayoutManager linearLayoutManagertopRatedRecyclerView = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        LinearLayoutManager linearLayoutManagerplayingNowRecyclerView = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        LinearLayoutManager linearLayoutManagerupcomingRecyclerView = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        LinearLayoutManager linearLayoutManagerfavoriteRecyclerView = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
+        popularRecyclerView.setLayoutManager(linearLayoutManagerpopularRecyclerView);
+        topRatedRecyclerView.setLayoutManager(linearLayoutManagertopRatedRecyclerView);
+        playingNowRecyclerView.setLayoutManager(linearLayoutManagerplayingNowRecyclerView);
+        upcomingRecyclerView.setLayoutManager(linearLayoutManagerupcomingRecyclerView);
+        favoriteRecyclerView.setLayoutManager(linearLayoutManagerfavoriteRecyclerView);
         myToolbar.setTitle(getResources().getString(R.string.app_name));
         setSupportActionBar(myToolbar);
     }
+
 
     public void getPopularMovies(){
         Call<MoviesResponse> call = apiService.getPopularMovies(API_KEY);
@@ -192,6 +202,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
     }
+
+
     public void getTopRatedMovies(){
         Call<MoviesResponse> call = apiService.getTopRatedMovies(API_KEY);
         call.enqueue(new Callback<MoviesResponse>() {
@@ -208,6 +220,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
     }
+
+
     public void getNowPlayingMovies(){
         Call<MoviesResponse> call = apiService.getNowPlayingMovies(API_KEY);
         call.enqueue(new Callback<MoviesResponse>() {
@@ -224,6 +238,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
     }
+
+
     public void getUpcomingMovies(){
         Call<MoviesResponse> call = apiService.getUpcomingMovies(API_KEY);
         call.enqueue(new Callback<MoviesResponse>() {
@@ -244,14 +260,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
+
     @Override
-    protected void onStart() {
+    protected void onStart()
+    {
+        Log.e("onStart","----------------------------------------");
         super.onStart();
     }
+
 
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+
+        Log.e("onCreateLoader","----------------------------------------");
+
 
         return new CursorLoader(this,
                 MovieProvider.CONTENT_URI,
@@ -261,10 +284,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 null);
     }
 
+
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        Log.e(TAG,"Loader Finished");
+
+        Log.e(TAG,"Loader Finished------------------------------------------");
         if (data != null && data.getCount() > 0) {
+            Log.e("data.getCount()",data.getCount()+"------------------------------------------");
             List<Movie> movies = new ArrayList<>();
             data.moveToFirst();
             do {
@@ -281,14 +307,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             } while (data.moveToNext());
             movieAdatpter = new MovieAdatpter(this, movies);
             favoriteRecyclerView.setAdapter(movieAdatpter);
+
         } else {
-            Toasty.error(this,"No Movie Added To Favorite Yet",Toast.LENGTH_SHORT).show();
-        }
+
+            favoriteRecyclerView.setAdapter(null);
+
+             }
 
     }
+
 
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
+        Log.e(TAG,"onLoaderReset------------------------------------------");
     }
+
+
 }
