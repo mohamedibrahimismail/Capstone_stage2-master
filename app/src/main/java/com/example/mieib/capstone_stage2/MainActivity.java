@@ -1,14 +1,8 @@
 package com.example.mieib.capstone_stage2;
 
-import android.annotation.SuppressLint;
-import android.database.Cursor;
-import android.nfc.Tag;
-import android.support.annotation.NonNull;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,18 +17,12 @@ import android.widget.Toast;
 import com.example.mieib.capstone_stage2.Models.Movie;
 import com.example.mieib.capstone_stage2.Models.MoviesResponse;
 import com.example.mieib.capstone_stage2.adapter.MovieAdatpter;
-import com.example.mieib.capstone_stage2.contentprovider.MovieProvider;
-import com.example.mieib.capstone_stage2.database.MovieContruct;
-import com.example.mieib.capstone_stage2.Models.Movie;
-import com.example.mieib.capstone_stage2.Models.MoviesResponse;
+import com.example.mieib.capstone_stage2.database.Local.Favorite;
+import com.example.mieib.capstone_stage2.database.Local.FavoriteViewModel;
 import com.example.mieib.capstone_stage2.Network.BaseUrls;
 import com.example.mieib.capstone_stage2.Network.CheckInternetConnection;
 import com.example.mieib.capstone_stage2.Network.rest.ApiClient;
 import com.example.mieib.capstone_stage2.Network.rest.ApiInteface;
-import com.example.mieib.capstone_stage2.adapter.MovieAdatpter;
-import com.example.mieib.capstone_stage2.constants.Constants;
-import com.example.mieib.capstone_stage2.contentprovider.MovieProvider;
-import com.example.mieib.capstone_stage2.database.MovieContruct;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -53,7 +41,7 @@ import retrofit2.Response;
 import static com.example.mieib.capstone_stage2.constants.Constants.ADMOB_APP_ID;
 import static com.example.mieib.capstone_stage2.constants.Constants.API_KEY;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "aaaaaaaaaaa";
 //    private static final String TAG = MainActivity.class.getSimpleName();
     private BaseUrls baseUrls;
@@ -101,14 +89,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             Toasty.error(getApplicationContext(), getResources().getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
             progressBar.setVisibility(View.GONE);
         }
+
+        hadleFavoriteList();
     }
 
 
-    @Override
-    protected void onResume() {
-        getSupportLoaderManager().restartLoader(0, null, this);
-        super.onResume();
-    }
+
 
     private void initAdMob(){
 
@@ -168,6 +154,43 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
     }
+
+    private void hadleFavoriteList() {
+
+        FavoriteViewModel favoriteViewModel = ViewModelProviders.of(this).get(FavoriteViewModel.class);
+        favoriteViewModel.getAllNotes().observe(this, new Observer<List<Favorite>>() {
+            @Override
+            public void onChanged(@Nullable List<Favorite> movies) {
+                update_UI(movies);
+            }
+        });
+
+    }
+
+    private void update_UI(List<Favorite> favoritemovies) {
+
+        List<Movie> movies = new ArrayList<>();
+        for(Favorite favorite : favoritemovies) {
+
+            Movie movie = new Movie();
+            movie.setId(favorite.getId());
+            movie.setPoster_path(favorite.getPoster());
+            movie.setTitle(favorite.getTitle());
+            movie.setVote_average(Double.parseDouble(favorite.getRating()));
+            movies.add(movie);
+        }
+
+         if(!movies.isEmpty()) {
+             favoriteRecyclerView.setVisibility(View.VISIBLE);
+             movieAdatpter = new MovieAdatpter(this, movies);
+             favoriteRecyclerView.setAdapter(movieAdatpter);
+         }else {
+            favoriteRecyclerView.setVisibility(View.GONE);
+         }
+
+    }
+
+
 
     private void initUi(){
         LinearLayoutManager linearLayoutManagerpopularRecyclerView = new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false);
@@ -257,71 +280,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Log.e(TAG,t.getMessage());
             }
         });
-    }
-
-
-
-    @Override
-    protected void onStart()
-    {
-        Log.e("onStart","----------------------------------------");
-        super.onStart();
-    }
-
-
-    @NonNull
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-
-        Log.e("onCreateLoader","----------------------------------------");
-
-
-        return new CursorLoader(this,
-                MovieProvider.CONTENT_URI,
-                null,
-                null,
-                null,
-                null);
-    }
-
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-
-        Log.e(TAG,"Loader Finished------------------------------------------");
-        if (data != null && data.getCount() > 0) {
-            Log.e("data.getCount()",data.getCount()+"------------------------------------------");
-            List<Movie> movies = new ArrayList<>();
-            data.moveToFirst();
-            do {
-                int movieID = data.getInt(data.getColumnIndex(MovieContruct.Favorite.MOVIE_ID));
-                String movieTitle = data.getString(data.getColumnIndex(MovieContruct.Favorite.TITLE));
-                String moviePosterPath = data.getString(data.getColumnIndex(MovieContruct.Favorite.POSTER_PATH));
-                int movieRating = data.getInt(data.getColumnIndex(MovieContruct.Favorite.VOTE_AVERAGE));
-                Movie movie = new Movie();
-                movie.setId(movieID);
-                movie.setPoster_path(moviePosterPath);
-                movie.setTitle(movieTitle);
-                movie.setVote_average(movieRating);
-                movies.add(movie);
-            } while (data.moveToNext());
-            movieAdatpter = new MovieAdatpter(this, movies);
-            favoriteRecyclerView.setAdapter(movieAdatpter);
-
-        } else {
-
-            favoriteRecyclerView.setAdapter(null);
-
-
-             }
-
-    }
-
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-
-        Log.e(TAG,"onLoaderReset------------------------------------------");
     }
 
 

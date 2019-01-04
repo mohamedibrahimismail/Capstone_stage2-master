@@ -25,11 +25,7 @@
             </meta-data>
         </activity>
         <activity android:name=".ContainerActivity" />
-        <provider
-            android:exported="true"
-            android:name=".contentprovider.MovieProvider"
-            android:authorities="movienewsprovider">
-        </provider>
+
         <receiver android:name=".MovieWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
