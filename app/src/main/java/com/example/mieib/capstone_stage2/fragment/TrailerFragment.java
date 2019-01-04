@@ -71,7 +71,7 @@ public class TrailerFragment extends Fragment {
         if (CheckInternetConnection.isConnected(getActivity())) {
             new FetchTrailerData().execute("http://api.themoviedb.org/3/movie/"+MOVIE_ID+"/videos?api_key="+API_KEY);
         }else
-            Toast.makeText(getActivity(), R.string.no_internet+" for Trailers and Reviews !!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.no_internet+getString(R.string.forTrailersandReviews), Toast.LENGTH_SHORT).show();
     }
 
     private void initUi(){
